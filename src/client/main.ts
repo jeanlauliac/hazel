@@ -5,7 +5,6 @@
     box.style.position = "absolute";
     box.style.left = "100px";
     box.style.top = "100px";
-    box.style.overflow = "hidden";
     box.style.cursor = "grab";
 
     // box.style.pointerEvents = "none";
@@ -18,11 +17,13 @@
     let prev = [0, 0];
     let pos = [100, 100];
 
-    box.addEventListener("mousedown", (ev) => {
+    document.addEventListener("mousedown", (ev) => {
+        if (ev.target !== box) return;
+
         moving = true;
         prev = [ev.clientX, ev.clientY];
     });
-    box.addEventListener("mouseup", (ev) => {
+    document.addEventListener("mouseup", (ev) => {
         moving = false;
     });
 
