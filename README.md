@@ -1,16 +1,15 @@
-# Hades platform
+# Hazel
 
 ## Design Principles
 
--   convention over configuration: an average-sized app should need no configuration;
--   batteries included: an average-sized app should need no extension or external package;
--   simple programming language that appeals to people who haven't programmed before;
--   language should be consistent, concise, and nicely legible;
--   errors, whether in syntax or at runtime, should always be actionable;
--   amazing, delighful developer experience: instant reload, keeps state;
--   encourages self-documenting code with named parameters, etc.
-
-## Nice to have
-
--   support for number units, ex. "1h" as time interval
--   resource files can be referenced from the code out of the box: images, fonts, text
+-   **Drag and drop:** no need to manually set up flexboxs, columns, sections,
+    spacers. Just drag items of content around and leverage automatic guides,
+    spacing, and adaptability to container sizing.
+-   **Convention over configuration:** pieces of content and forms just work as
+    expected from the start, minimal configuration needed.
+-   **Batteries included:** an average-sized app should need no external plugin.
+    Rich library of form controls.
+-   **Instant preview:** modify an item on your laptop, have it reload instantly on
+    your phone, without losing any state.
+-   **Visual entities:** create, edit entities in a graph of data that backs up
+    your app, and connect these entities to content on screen.
