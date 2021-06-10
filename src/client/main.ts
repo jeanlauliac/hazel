@@ -1,4 +1,5 @@
-type Vec2 = [number, number];
+import vec2, { Vec2 } from "./vec2";
+
 type Box = { elem: HTMLDivElement; pos: Vec2 };
 
 (async () => {
@@ -16,8 +17,8 @@ type Box = { elem: HTMLDivElement; pos: Vec2 };
 
     const update_box = (box: Box) => {
         const { elem, pos } = box;
-        elem.style.left = `${pos[0]}px`;
-        elem.style.top = `${pos[1]}px`;
+        elem.style.left = `${pos.x}px`;
+        elem.style.top = `${pos.y}px`;
     };
 
     const add_box = (text: string, pos: Vec2) => {
@@ -33,18 +34,18 @@ type Box = { elem: HTMLDivElement; pos: Vec2 };
 
         boxes.push(box);
         document.body.appendChild(elem);
-        h_guides.push(pos[0]);
+        h_guides.push(pos.x);
     };
 
-    add_box("hello, world", [100, 100]);
-    add_box("this is text", [150, 220]);
-    add_box("move me aroud", [200, 300]);
+    add_box("hello, world", vec2(100, 100));
+    add_box("this is text", vec2(150, 220));
+    add_box("move me aroud", vec2(200, 300));
 
     document.body.style.position = "relative";
 
     let moving_box: Box | void = undefined;
-    let prev = [0, 0];
-    let pos = [0, 0];
+    let prev = vec2(0, 0);
+    let pos = vec2(0, 0);
 
     const find_box = (target: EventTarget | null) =>
         boxes.find((box) => box.elem === target);
@@ -55,33 +56,32 @@ type Box = { elem: HTMLDivElement; pos: Vec2 };
 
         moving_box = box;
 
-        const gi = h_guides.indexOf(box.pos[0]);
+        const gi = h_guides.indexOf(box.pos.x);
         if (gi) h_guides.splice(gi, 1);
 
-        prev = [ev.clientX, ev.clientY];
-        pos = [box.pos[0], box.pos[1]];
+        prev = vec2(ev.clientX, ev.clientY);
+        pos = box.pos.clone();
     });
 
     document.addEventListener("mouseup", (ev) => {
         if (!moving_box) return;
 
-        h_guides.push(moving_box.pos[0]);
+        h_guides.push(moving_box.pos.x);
         moving_box = undefined;
         guide_elem.style.display = "none";
     });
 
     document.addEventListener("mousemove", (ev) => {
         if (!moving_box) return;
-        const np = [ev.clientX, ev.clientY];
-        pos[0] += np[0] - prev[0];
-        pos[1] += np[1] - prev[1];
+        const np = vec2(ev.clientX, ev.clientY);
+        pos.add(np.minus(prev));
 
-        const fpos: Vec2 = [pos[0], pos[1]];
+        const fpos: Vec2 = pos.clone();
 
         let guided = false;
         for (const gx of h_guides) {
-            if (Math.abs(gx - fpos[0]) < 20) {
-                fpos[0] = gx;
+            if (Math.abs(gx - fpos.x) < 20) {
+                fpos.x = gx;
                 guide_elem.style.left = `${gx}px`;
                 guide_elem.style.display = "block";
                 guided = true;
