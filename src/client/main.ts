@@ -3,20 +3,6 @@ import vec2, { Vec2 } from "./vec2";
 type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
 
 (async () => {
-    // const canvas = document.createElement("canvas");
-    // const ctx = canvas.getContext("2d");
-    // document.body.appendChild(canvas);
-
-    // const redraw = () => {};
-
-    // const resizeCanvas = () => {
-    //     canvas.width = window.innerWidth;
-    //     canvas.height = window.innerHeight;
-    //     redraw();
-    // };
-    // window.addEventListener("resize", resizeCanvas, false);
-    // resizeCanvas();
-
     let boxes: Box[] = [];
     const guide_elem = document.createElement("div");
     guide_elem.style.width = "2px";
@@ -37,6 +23,7 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
     resz_elem.style.cursor = "col-resize";
     resz_elem.style.background = "white";
     resz_elem.style.zIndex = "10";
+    resz_elem.style.display = "none";
     document.body.appendChild(resz_elem);
 
     let moving_box: Box | void = undefined;
@@ -49,6 +36,7 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
         elem.style.width = `${box.width}px`;
 
         if (sel_box === box) {
+            resz_elem.style.display = "block";
             resz_elem.style.left = `${box.pos.x + box.width - 5}px`;
             resz_elem.style.top = `${
                 box.pos.y + box.elem.clientHeight / 2 - 5
@@ -84,9 +72,25 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
     const find_box = (target: EventTarget | null) =>
         boxes.find((box) => box.elem === target);
 
+    let is_resizing = false;
+
     document.addEventListener("mousedown", (ev) => {
+        prev = vec2(ev.clientX, ev.clientY);
+
+        if (ev.target === resz_elem) {
+            is_resizing = true;
+            return;
+        }
+
         const box = find_box(ev.target);
-        if (box === undefined) return;
+        if (box === undefined) {
+            if (!sel_box) return;
+
+            sel_box.elem.style.backgroundImage = "none";
+            resz_elem.style.display = "none";
+            sel_box = undefined;
+            return;
+        }
 
         moving_box = box;
         box.elem.style.cursor = "grabbing";
@@ -96,12 +100,15 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
         }
         sel_box = box;
 
-        prev = vec2(ev.clientX, ev.clientY);
         pos = box.pos.clone();
         update_box(box);
     });
 
     document.addEventListener("mouseup", (ev) => {
+        if (is_resizing) {
+            is_resizing = false;
+            return;
+        }
         if (!moving_box) return;
 
         moving_box.elem.style.cursor = "grab";
@@ -110,8 +117,17 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
     });
 
     document.addEventListener("mousemove", (ev) => {
-        if (!moving_box) return;
         const np = vec2(ev.clientX, ev.clientY);
+
+        if (is_resizing && sel_box !== undefined) {
+            // wrong, need to keep track of original pos
+            sel_box.width = Math.max(sel_box.width + np.x - prev.x, 10);
+            update_box(sel_box);
+            prev = np;
+            return;
+        }
+
+        if (!moving_box) return;
         pos.add(np.minus(prev));
 
         const fpos: Vec2 = pos.clone();
