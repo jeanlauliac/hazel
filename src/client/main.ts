@@ -2,6 +2,18 @@ import vec2, { Vec2 } from "./vec2";
 
 type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
 
+// class Box {
+//     private element: HTMLDivElement;
+//     private position_: Vec2;
+//     private width: number;
+
+//     constructor() {}
+
+//     get position() {
+//         return this.position_;
+//     }
+// }
+
 (async () => {
     let boxes: Box[] = [];
     const guide_elem = document.createElement("div");
@@ -78,6 +90,7 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
         prev = vec2(ev.clientX, ev.clientY);
 
         if (ev.target === resz_elem) {
+            document.body.style.cursor = "col-resize";
             is_resizing = true;
             return;
         }
@@ -106,6 +119,7 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
 
     document.addEventListener("mouseup", (ev) => {
         if (is_resizing) {
+            document.body.style.cursor = "auto";
             is_resizing = false;
             return;
         }
