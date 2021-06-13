@@ -2,18 +2,6 @@ import vec2, { Vec2 } from "./vec2";
 
 type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
 
-// class Box {
-//     private element: HTMLDivElement;
-//     private position_: Vec2;
-//     private width: number;
-
-//     constructor() {}
-
-//     get position() {
-//         return this.position_;
-//     }
-// }
-
 (async () => {
     let boxes: Box[] = [];
     const guide_elem = document.createElement("div");
@@ -78,8 +66,10 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
 
     document.body.style.position = "relative";
 
-    let prev = vec2(0, 0);
-    let pos = vec2(0, 0);
+    // let prev_client_pos = vec2(0, 0);
+    let client_origin = vec2(0, 0);
+    let original_pos = vec2(0, 0);
+    let original_width = 0;
 
     const find_box = (target: EventTarget | null) =>
         boxes.find((box) => box.elem === target);
@@ -87,10 +77,11 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
     let is_resizing = false;
 
     document.addEventListener("mousedown", (ev) => {
-        prev = vec2(ev.clientX, ev.clientY);
+        client_origin = vec2(ev.clientX, ev.clientY);
 
         if (ev.target === resz_elem) {
             document.body.style.cursor = "col-resize";
+            original_width = sel_box?.width ?? 0;
             is_resizing = true;
             return;
         }
@@ -107,13 +98,13 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
 
         moving_box = box;
         box.elem.style.cursor = "grabbing";
+        original_pos = box.pos.clone();
 
         if (sel_box !== undefined && sel_box !== box) {
             sel_box.elem.style.backgroundImage = "none";
         }
         sel_box = box;
 
-        pos = box.pos.clone();
         update_box(box);
     });
 
@@ -131,20 +122,17 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
     });
 
     document.addEventListener("mousemove", (ev) => {
-        const np = vec2(ev.clientX, ev.clientY);
+        const client_pos = vec2(ev.clientX, ev.clientY);
 
         if (is_resizing && sel_box !== undefined) {
-            // wrong, need to keep track of original pos
-            sel_box.width = Math.max(sel_box.width + np.x - prev.x, 10);
+            const new_width = client_pos.x - client_origin.x + original_width;
+            sel_box.width = Math.max(new_width, 50);
             update_box(sel_box);
-            prev = np;
             return;
         }
 
         if (!moving_box) return;
-        pos.add(np.minus(prev));
-
-        const fpos: Vec2 = pos.clone();
+        const fpos = client_pos.minus(client_origin).plus(original_pos);
 
         let guided = false;
         for (const box of boxes) {
@@ -162,8 +150,6 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
         }
 
         moving_box.pos = fpos;
-        prev = np;
-
         update_box(moving_box);
     });
 
