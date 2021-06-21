@@ -9,11 +9,11 @@
       "type": "pwa-node",
       "request": "launch",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only", "-r", "../../src/dev.js"],
+      "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
 
-      "args": ["../../src/cli.ts"],
+      "args": ["src/cli.ts"],
       
-      "cwd": "${workspaceRoot}/examples/hello_world",
+      "cwd": "${workspaceRoot}",
       "internalConsoleOptions": "openOnSessionStart",
       "skipFiles": ["<node_internals>/**", "node_modules/**"]
     },

@@ -1,17 +1,17 @@
+import Element from "./Element";
 import vec2, { Vec2 } from "./vec2";
 
 type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
 
 (async () => {
     let boxes: Box[] = [];
-    const guide_elem = document.createElement("div");
-    guide_elem.style.width = "2px";
-    guide_elem.style.height = "1000px";
-    guide_elem.style.top = "0";
-    guide_elem.style.background = "#ffd700";
-    guide_elem.style.position = "absolute";
-    guide_elem.style.display = "none";
-    document.body.appendChild(guide_elem);
+
+    const guide_elem = new Element("div");
+    guide_elem.position.set(vec2(0, 0));
+    guide_elem.size.set(vec2(2, 1000));
+    guide_elem.background = "#ffd700";
+    guide_elem.append_to(document.body);
+    guide_elem.visible = false;
 
     const resz_elem = document.createElement("div");
     resz_elem.style.border = "solid 1px #333";
@@ -118,7 +118,7 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
 
         moving_box.elem.style.cursor = "grab";
         moving_box = undefined;
-        guide_elem.style.display = "none";
+        guide_elem.hide();
     });
 
     document.addEventListener("mousemove", (ev) => {
@@ -139,14 +139,14 @@ type Box = { elem: HTMLDivElement; pos: Vec2; width: number };
             if (box === moving_box) continue;
             if (Math.abs(box.pos.x - fpos.x) < 20) {
                 fpos.x = box.pos.x;
-                guide_elem.style.left = `${box.pos.x}px`;
-                guide_elem.style.display = "block";
+                guide_elem.position.x = box.pos.x;
+                guide_elem.show();
                 guided = true;
                 break;
             }
         }
         if (!guided) {
-            guide_elem.style.display = "none";
+            guide_elem.hide();
         }
 
         moving_box.pos = fpos;
